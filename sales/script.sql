@@ -130,11 +130,43 @@ limit 5;
 
 -- Q.9 Write a SQL query to find the number of unique customers who purchased items from each category.
 
+select 
+category, count(distinct customer_id) as unique_customers_count
+from sales_retail
+group by 1;
 
 
+-- Q.10 Write a SQL query to create each shift and number of orders (Example Morning <12, Afternoon Between 12 & 17, Evening >17)
 
-
-
+select shift, count(*) as number_of_orders
+from
+(select *,
+	case
+		when hour(sale_time)<=12 then 'Morning'
+		when hour(sale_time) between 12 and 17 then 'Afternoon'
+		else 'Evening'
+    end as shift
+from sales_retail) as t1
+group by shift;
 
 
 --  *************************************************************************************************************
+-- or
+
+
+WITH hourly_sale
+AS
+(
+SELECT *,
+    CASE
+        when hour(sale_time)<=12 then 'Morning'
+		when hour(sale_time) between 12 and 17 then 'Afternoon'
+		else 'Evening'
+    END as shift
+FROM sales_retail
+)
+SELECT 
+    shift,
+    COUNT(*) as total_orders    
+FROM hourly_sale
+GROUP BY shift
